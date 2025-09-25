@@ -35,78 +35,113 @@ public class SauceShops {
 
     @Test
     public void testShop() {
-        //login:
-        driver.findElement(By.cssSelector("input#user-name")).sendKeys("standard_user");
-        driver.findElement(By.cssSelector("input#password")).sendKeys("secret_sauce");
-        driver.findElement(By.cssSelector("input#login-button")).click();
+        login();
+        firstItemPrice = getFirstItemPrice();
+        openFirstItemPage();
 
-        // get first item price:
-        firstItemPrice = driver.findElement(By.cssSelector("div.inventory_item div.inventory_item_price")).getText();
-        System.out.println("firstItemPrice: " + firstItemPrice);
-
-        // open first item page:
-        driver.findElement(By.cssSelector("div.inventory_item div.inventory_item_name")).click();
-
-        // get item price on item page (details page):
-        String firstItemPriceOnItemPage = driver.findElement(By.cssSelector("div.inventory_details div.inventory_details_price")).getText();
-        System.out.println("firstItemPriceOnItemPage: " + firstItemPriceOnItemPage);
-
-        // assertion that price on main page are equal price on item page:
+        String firstItemPriceOnItemPage = getItemPriceOnItemPage();
         Assert.assertEquals(firstItemPrice, firstItemPriceOnItemPage);
 
-        // added product to cart from product page
-        driver.findElement(By.cssSelector("button[data-test='add-to-cart']")).click();
+        addedProductToCartFromProductPage();
 
-        //get number from cart icon:
-        String itemNumber = driver.findElement(By.cssSelector("div#shopping_cart_container span[data-test=shopping-cart-badge]")).getText();
-        // assertion that 1 appear on cart icon
+        String itemNumber = getNumberFromIconCart();
         Assert.assertEquals(itemNumber, "1");
 
-        //goto cart from cart icon:
-        driver.findElement(By.cssSelector("div#shopping_cart_container a[data-test='shopping-cart-link']")).click();
+        cartIconBtn();
 
-        //get item price from cart site
-        String itemPriceOnCartSite = driver.findElement(By.cssSelector("div.inventory_item_price[data-test='inventory-item-price']")).getText();
-
-        // assertion that price on cart page are equal price on item page:
+        String itemPriceOnCartSite = getItemPriceFromCartSite();
         Assert.assertEquals(itemPriceOnCartSite, firstItemPrice);
 
-        // goto to checkout page
-        driver.findElement(By.cssSelector("button#checkout")).click();
-
-        // Switched to XPATH selectors:
-        // fill checkout inputs
-        driver.findElement(By.xpath("//input[@data-test='firstName']")).sendKeys("Name");
-        driver.findElement(By.xpath("//input[@name='lastName']")).sendKeys("LastName");
-        driver.findElement(By.xpath("//input[@placeholder='Zip/Postal Code']")).sendKeys("LastName");
-
-       // continue from checkout site
-        driver.findElement(By.xpath("//input[@type='submit'][@id='continue']")).click();
-
-        // get Item total value:
-        String itemTotal = driver.findElement(By.xpath("//div[@data-test='subtotal-label']")).getText();
-        System.out.println("itemTotal: " + itemTotal);
-        // get Tax value:
-        String tax = driver.findElement(By.xpath("//div[@data-test='tax-label']")).getText();
-        System.out.println("tax: " + tax);
-        // get Total value:
-        String total = driver.findElement(By.xpath("//div[@data-test='total-label']")).getText();
-        System.out.println("total: " + total);
+        gotoCheckoutPage();
+        fillCheckoutData();
+        continueFromCheckoutSite();
+        String itemTotal = getItemTotalValue();
+        String tax = getTaxValue();
+        String total = getTotalValue();
 
         Assert.assertEquals(itemTotal, "Item total: $29.99");
         Assert.assertEquals(tax, "Tax: $2.40");
         Assert.assertEquals(total, "Total: $32.39");
 
-        // assertion that price on main page are equal price on checkout overview page:
-        String itemPriceOnCheckoutOverview = driver.findElement(By.xpath("//div[@data-test='inventory-item-price']")).getText();
+        String itemPriceOnCheckoutOverview = getItemPriceOnCheckoutSummaryPage();
         Assert.assertEquals(firstItemPrice, itemPriceOnCheckoutOverview);
 
-        // goto finish:
-        driver.findElement(By.xpath("//button[@name='finish' and @data-test='finish']")).click();
+        finishOrder();
 
-        //Assertion information on checkout completed site:
-        String informationText = driver.findElement(By.xpath("//h2[contains(@class, 'complete-header')]")).getText();
+        String informationText = getSuccessConfirmationText();
         Assert.assertEquals(informationText, "Thank you for your order!");
+    }
+
+    public void login() {
+        driver.findElement(By.cssSelector("input#user-name")).sendKeys("standard_user");
+        driver.findElement(By.cssSelector("input#password")).sendKeys("secret_sauce");
+        driver.findElement(By.cssSelector("input#login-button")).click();
+    }
+
+    public String getFirstItemPrice() {
+        return driver.findElement(By.cssSelector("div.inventory_item div.inventory_item_price")).getText();
+    }
+
+    public String getItemPriceOnItemPage() {
+         return driver.findElement(By.cssSelector("div.inventory_details div.inventory_details_price")).getText();
+    }
+
+    public void addedProductToCartFromProductPage() {
+        driver.findElement(By.cssSelector("button[data-test='add-to-cart']")).click();
+    }
+
+    public String getItemPriceFromCartSite() {
+        return driver.findElement(By.cssSelector("div.inventory_item_price[data-test='inventory-item-price']")).getText();
+    }
+
+    public String getNumberFromIconCart() {
+        return driver.findElement(By.cssSelector("div#shopping_cart_container span[data-test=shopping-cart-badge]")).getText();
+    }
+
+    public void cartIconBtn() {
+        driver.findElement(By.cssSelector("div#shopping_cart_container a[data-test='shopping-cart-link']")).click();
+    }
+
+    private void fillCheckoutData() {
+        driver.findElement(By.xpath("//input[@data-test='firstName']")).sendKeys("Name");
+        driver.findElement(By.xpath("//input[@name='lastName']")).sendKeys("LastName");
+        driver.findElement(By.xpath("//input[@placeholder='Zip/Postal Code']")).sendKeys("PostCode");
+    }
+
+    public void openFirstItemPage() {
+        driver.findElement(By.cssSelector("div.inventory_item div.inventory_item_name")).click();
+    }
+
+    public void gotoCheckoutPage() {
+        driver.findElement(By.cssSelector("button#checkout")).click();
+    }
+
+    public void continueFromCheckoutSite() {
+        driver.findElement(By.xpath("//input[@type='submit'][@id='continue']")).click();
+    }
+
+    public String getItemTotalValue() {
+        return driver.findElement(By.xpath("//div[@data-test='subtotal-label']")).getText();
+    }
+
+    public String getTaxValue() {
+        return driver.findElement(By.xpath("//div[@data-test='tax-label']")).getText();
+    }
+
+    public String getTotalValue() {
+        return driver.findElement(By.xpath("//div[@data-test='total-label']")).getText();
+    }
+
+    public String getItemPriceOnCheckoutSummaryPage() {
+        return driver.findElement(By.xpath("//div[@data-test='inventory-item-price']")).getText();
+    }
+
+    public void finishOrder() {
+        driver.findElement(By.xpath("//button[@name='finish' and @data-test='finish']")).click();
+    }
+
+    public String getSuccessConfirmationText() {
+        return driver.findElement(By.xpath("//h2[contains(@class, 'complete-header')]")).getText();
     }
 
     @AfterClass
