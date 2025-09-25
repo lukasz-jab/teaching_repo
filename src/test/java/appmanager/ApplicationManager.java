@@ -1,3 +1,5 @@
+package appmanager;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -9,7 +11,7 @@ import java.util.HashMap;
 public class ApplicationManager {
 
     WebDriver driver;
-    
+
     public void init() {
         //avoid Chrome Unnecessary Alerts
         ChromeOptions options = new ChromeOptions();

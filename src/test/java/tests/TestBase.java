@@ -1,16 +1,21 @@
+package tests;
+
+import appmanager.ApplicationManager;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
-public class TestBase extends ApplicationManager {
+public class TestBase {
+
+    ApplicationManager app = new ApplicationManager();
 
     @BeforeClass
     public void setup() {
-        init();
+        app.init();
     }
 
 
     @AfterClass
     public void tearDown() {
-        stop();
+        app.stop();
     }
 }
