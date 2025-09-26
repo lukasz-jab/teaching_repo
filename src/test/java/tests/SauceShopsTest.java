@@ -1,68 +1,74 @@
 package tests;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class SauceShopsTest extends TestBase {
 
     String firstItemPrice = "";
 
+    @BeforeClass
+    public void login() {
+        app.session().login();
+    }
+
     @Test(priority = 1)
     public void testOpenMainPage() {
-        app.login();
-        firstItemPrice = app.getFirstItemPrice();
+        //app.session().login();
+        firstItemPrice = app.mainPage().getFirstItemPrice();
     }
 
     @Test(priority = 2)
     public void testProductPageInfo() {
-        app.openFirstItemPage();
+        app.mainPage().openFirstItemPage();
 
-        String firstItemPriceOnItemPage = app.getItemPriceOnItemPage();
+        String firstItemPriceOnItemPage = app.productPage().getPrice();
         Assert.assertEquals(firstItemPrice, firstItemPriceOnItemPage);
     }
 
     @Test(priority = 3)
     public void testAddToCart() {
-        app.addedProductToCartFromProductPage();
+        app.productPage().addToCart();
 
-        String itemNumber = app.getNumberFromIconCart();
+        String itemNumber = app.cartPage().getNumberFromIconCart();
         Assert.assertEquals(itemNumber, "1");
     }
 
     @Test(priority = 4)
     public void testCartPageInfo() {
-        app.cartIconBtn();
+        app.cartPage().cartIconBtn();
 
-        String itemPriceOnCartSite = app.getItemPriceFromCartSite();
+        String itemPriceOnCartSite = app.cartPage().getItemPriceFromCartSite();
         Assert.assertEquals(itemPriceOnCartSite, firstItemPrice);
     }
 
     @Test(priority = 5)
     public void testFillCheckoutInputs() {
-        app.gotoCheckoutPage();
-        app.fillCheckoutData();
+        app.checkoutPage().gotoPage();
+        app.checkoutPage().fillCheckoutData();
     }
 
     @Test(priority = 6)
     public void testCheckoutInfo() {
-        app.continueFromCheckoutSite();
-        String itemTotal = app.getItemTotalValue();
-        String tax = app.getTaxValue();
-        String total = app.getTotalValue();
+        app.checkoutPage().continueFromCheckoutSite();
+        String itemTotal = app.checkoutPage().getNettoValue();
+        String tax = app.checkoutPage().getTaxValue();
+        String total = app.checkoutPage().getTotalValue();
 
         Assert.assertEquals(itemTotal, "Item total: $29.99");
         Assert.assertEquals(tax, "Tax: $2.40");
         Assert.assertEquals(total, "Total: $32.39");
 
-        String itemPriceOnCheckoutOverview = app.getItemPriceOnCheckoutSummaryPage();
+        String itemPriceOnCheckoutOverview = app.checkoutPage().getItemPriceOnCheckoutSummaryPage();
         Assert.assertEquals(firstItemPrice, itemPriceOnCheckoutOverview);
     }
 
     @Test(priority = 7)
     public void testFinishedOrderInfo() {
-        app.finishOrder();
+        app.checkoutPage().finishOrder();
 
-        String informationText = app.getSuccessConfirmationText();
+        String informationText = app.checkoutPage().getSuccessConfirmationText();
         Assert.assertEquals(informationText, "Thank you for your order!");
     }
 }
