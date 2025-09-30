@@ -41,4 +41,16 @@ public class MainPageHelper {
         //driver.findElement(By.xpath("//div[@data-test='inventory-item']//a//div[contains(text(), '" + randomMainPageProduct.getTitle() + "')]")).click();
         driver.findElement(By.xpath(String.format("//div[@data-test='inventory-item']//a//div[contains(text(), '%s')]", randomMainPageProduct.getTitle()))).click();
     }
+
+    public void addToCart(Product product) {
+        driver.findElement(By.xpath("//div[@data-test='inventory-item-name' and contains(text(), '" + product.getTitle() + "')]/../../..//button[contains(@data-test, 'add-to-cart-')]")).click();
+    }
+
+    public void openCart() {
+        driver.findElement(By.xpath("//div[contains(@class, 'shopping_cart_container')]//a[@data-test='shopping-cart-link']")).click();
+    }
+
+    public void removeFromCart(Product product) {
+        driver.findElement(By.xpath("//div[@data-test='inventory-item-name' and contains(text(), '" + product.getTitle() + "')]/../../..//button[contains(@data-test, 'remove-')]")).click();
+    }
 }

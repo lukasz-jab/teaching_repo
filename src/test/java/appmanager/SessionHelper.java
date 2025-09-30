@@ -16,4 +16,8 @@ public class SessionHelper {
         driver.findElement(By.cssSelector("input#password")).sendKeys("secret_sauce");
         driver.findElement(By.cssSelector("input#login-button")).click();
     }
+
+    public String getSiteAddr() {
+        return driver.getCurrentUrl();
+    }
 }
