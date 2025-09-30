@@ -1,12 +1,18 @@
 package tests;
 
+import model.Product;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashSet;
+
 public class SauceShopsTest extends TestBase {
 
-    String firstItemPrice = "";
+    String randomItemPrice = "";
+    Product randomMainPageProduct;
 
     @BeforeClass
     public void login() {
@@ -15,16 +21,16 @@ public class SauceShopsTest extends TestBase {
 
     @Test(priority = 1)
     public void testOpenMainPage() {
-        //app.session().login();
-        firstItemPrice = app.mainPage().getFirstItemPrice();
+        randomMainPageProduct = new HashSet<Product>(app.mainPage().getProducts()).iterator().next();
+        randomItemPrice = randomMainPageProduct.getPrice();
     }
 
     @Test(priority = 2)
     public void testProductPageInfo() {
-        app.mainPage().openFirstItemPage();
+        app.mainPage().openProductPage(randomMainPageProduct);
 
         String firstItemPriceOnItemPage = app.productPage().getPrice();
-        Assert.assertEquals(firstItemPrice, firstItemPriceOnItemPage);
+        Assert.assertEquals(randomItemPrice, firstItemPriceOnItemPage);
     }
 
     @Test(priority = 3)
@@ -40,7 +46,7 @@ public class SauceShopsTest extends TestBase {
         app.cartPage().cartIconBtn();
 
         String itemPriceOnCartSite = app.cartPage().getItemPriceFromCartSite();
-        Assert.assertEquals(itemPriceOnCartSite, firstItemPrice);
+        Assert.assertEquals(itemPriceOnCartSite, randomItemPrice);
     }
 
     @Test(priority = 5)
@@ -56,12 +62,15 @@ public class SauceShopsTest extends TestBase {
         String tax = app.checkoutPage().getTaxValue();
         String total = app.checkoutPage().getTotalValue();
 
-        Assert.assertEquals(itemTotal, "Item total: $29.99");
-        Assert.assertEquals(tax, "Tax: $2.40");
-        Assert.assertEquals(total, "Total: $32.39");
+        BigDecimal taxInfo = new BigDecimal(randomMainPageProduct.getPrice().replaceAll("\\$", "")).multiply(new BigDecimal("0.08")).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalInfo = new BigDecimal(randomMainPageProduct.getPrice().replaceAll("\\$", "")).add(taxInfo);
+
+        Assert.assertEquals(itemTotal, "Item total: " + randomMainPageProduct.getPrice());
+        Assert.assertEquals(tax, "Tax: $" + taxInfo);
+        Assert.assertEquals(total, "Total: $" + totalInfo);
 
         String itemPriceOnCheckoutOverview = app.checkoutPage().getItemPriceOnCheckoutSummaryPage();
-        Assert.assertEquals(firstItemPrice, itemPriceOnCheckoutOverview);
+        Assert.assertEquals(randomItemPrice, itemPriceOnCheckoutOverview);
     }
 
     @Test(priority = 7)
